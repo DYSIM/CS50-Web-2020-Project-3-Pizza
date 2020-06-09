@@ -8,7 +8,7 @@
 {% block script %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-<script src="{% static 'index.js' %}"> </script>
+<!-- <script src="{% static 'index.js' %}"> </script> -->
 {% endblock %}
 
 {% block body %}
@@ -41,6 +41,12 @@
         <h1>Welcome! {{user.username}}</h1>
       </div>
     </div>
+    <div class="container-fluid">
+      <div class="jumbotron jumbotron-fluid" id = 'userOrders'>
+        <h1>Your Orders</h1>
+        <p id = 'orderPlaceHolder'>Nothing is here. Start selecting below!</p>
+      </div>
+    </div>
 
     <div class="container-fluid" id='Menu'>
       <div class="center-title">
@@ -53,70 +59,438 @@
           <!-- Nav tabs -->
           <ul class="nav  tabs-menu-nav justify-content-center mb30" role="tablist">
               <li class="nav-item">
-                <a class="nav-link active show" href="#breakfast" aria-controls="breakfast" data-toggle="tab" aria-selected="true">Breakfast</a>
+                <a class="nav-link active show" href="#pizza" aria-controls="pizza" data-toggle="tab" aria-selected="true">Pizza</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#lunch" aria-controls="lunch" data-toggle="tab" aria-selected="false"> Lunch</a>
+                <a class="nav-link" href="#Subs" aria-controls="Subs" data-toggle="tab" aria-selected="false">Subs</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#dinner" aria-controls="dinner" data-toggle="tab" aria-selected="false">Dinner</a>
+                <a class="nav-link" href="#Toppings" aria-controls="Toppings" data-toggle="tab" aria-selected="false">Toppings</a>
               </li>
           </ul>
 
           <!-- Tab panes -->
+          <!-- There will be one tab for each type of menu: pizza, sub, salad etc
+          Most of the code will be similar to display the menu. Differences are in the form modal popup to submit the order -->
           <div class="tab-content">
-              <div role="tabpanel" class="tab-pane fade active show" id="breakfast">
+              <!-- pizza tab -->
+              <div role="tabpanel" class="tab-pane fade active show" id="pizza">
                   <div class="row">
+                      <!-- First half of pizza entries for left half of menu -->
                       <div class="col-md-6 mb20">
 
                         {% for entry in pizza1 %}
                           <article class="media">
                               <!-- Article Image -->
-                              <a class = "pizzaEntry" data-type = "{{entry.type}}" data-size = "{{entry.size}}" data-price = "{{entry.price}}" href=''>
-                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/'|add:entry.type|add:'_'|add:entry.pizzaDetails|add:'.jpg' %}" alt="Menu title">
+                              <a class = "pizzaEntry" href='#pizza1{{ forloop.counter }}' data-toggle="modal">
+                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/'|add:entry.Type|add:'_'|add:entry.Details|add:'.jpg' %}" alt="Menu title">
                               </a>
+
+
+                              <!-- Modal -->
+                              <div class="modal fade" id="pizza1{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                    <form id="role-form" action='/submitorderpizza'  method="POST">
+                                      {% csrf_token %}
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">{{entry.Type}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="Type" class="col-sm-2">Type</label>
+                                          <input name="Type" type="text" class="" value="{{entry.Type}}" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="Size" class="col-sm-2">Size</label>
+                                          <input name="Size" type="text" class="" value="{{entry.Size}}" readonly />
+                                        </div>
+
+                                        {% if entry.Details == '1 Topping' %}
+                                        <p>Please choose {{ entry.Details }}</p>
+                                          <div class="form-group">
+                                            <label for="Topping 1" class="col-sm-4">Choose topping</label>
+                                            <select name="Topping 1" class="form-control">
+                                              {% for topping_entry in toppings %}
+                                                <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                              {% endfor %}
+                                            </select>
+                                          </div>
+                                        {% else %}
+                                          {% if entry.Details == '2 Toppings' %}
+                                          <p>Please choose {{ entry.Details }}</p>
+                                            <div class="form-group">
+                                              <label for="Topping 1" class="col-sm-4">Choose Topping</label>
+                                              <select name="Topping 1" class="form-control">
+                                                {% for topping_entry in toppings %}
+                                                  <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                {% endfor %}
+                                              </select>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="Topping 2" class="col-sm-4">Choose Topping</label>
+                                              <select name="Topping 2" class="form-control">
+                                                {% for topping_entry in toppings %}
+                                                  <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                {% endfor %}
+                                              </select>
+                                            </div>
+                                          {% else %}
+                                            {% if entry.Details == '3 Toppings' %}
+                                            <p>Please choose {{ entry.Details }}</p>
+                                              <div class="form-group">
+                                                <label for="Topping 1" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 1" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                              <div class="form-group">
+                                                <label for="Topping 2" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 2" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                              <div class="form-group">
+                                                <label for="Topping 3" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 3" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                            {% else %}
+                                            <div class="form-group">
+                                              <label for="defaultIngredient" class="col-sm-3">Ingredient</label>
+                                              <input name="defaultIngredient" type="text" class="" value="{{entry.Details}}" readonly />
+                                            </div>
+                                            {% endif %}
+                                          {% endif %}
+                                        {% endif %}
+
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- Modal -->
+
 
                             <div class="media-body align-self-center">
                                 <div class="d-flex justify-content-between mb10">
-                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.type }}, {{entry.size}}</h3>
+                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.Type }}, {{entry.Size}}</h3>
 
                                     <div class="align-self-center">
-                                        <strong class="text-white font700">{{ entry.price }}</strong>
+                                        <strong class="text-white font700">{{ entry.Price }}</strong>
                                     </div>
                                 </div>
 
-                                <p class="mb-0">Contains: {{ entry.pizzaDetails }}</p>
+                                <p class="mb-0">Contains: {{ entry.Details }}</p>
                             </div>
                           </article>
                         {% endfor %}
 
-
+   <!-- pizza1 -->
                       </div>
+                      <!-- Second half of pizza entries for right half of menu -->
                       <div class="col-md-6 mb20">
                         {% for entry in pizza2 %}
                           <article class="media">
                               <!-- Article Image -->
-                              <a class="" href="#">
-                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/'|add:entry.type|add:'_'|add:entry.pizzaDetails|add:'.jpg' %}" alt="Menu title">
+                              <a class = "pizzaEntry" href='#pizza2{{ forloop.counter }}' data-toggle="modal">
+                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/'|add:entry.Type|add:'_'|add:entry.Details|add:'.jpg' %}" alt="Menu title">
                               </a>
+
+                              <!-- Modal -->
+                              <div class="modal fade" id="pizza2{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                    <form id="role-form" action='/submitorderpizza'  method="POST">
+                                      {% csrf_token %}
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">{{entry.Type}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="Type" class="col-sm-2">Type</label>
+                                          <input name="Type" type="text" class="" value="{{entry.Type}}" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="Size" class="col-sm-2">Size</label>
+                                          <input name="Size" type="text" class="" value="{{entry.Size}}" readonly />
+                                        </div>
+
+                                        {% if entry.Details == '1 Topping' %}
+                                        <p>Please choose {{ entry.Details }}</p>
+                                          <div class="form-group">
+                                            <label for="Topping 1" class="col-sm-4">Choose topping</label>
+                                            <select name="Topping 1" class="form-control">
+                                              {% for topping_entry in toppings %}
+                                                <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                              {% endfor %}
+                                            </select>
+                                          </div>
+                                        {% else %}
+                                          {% if entry.Details == '2 Toppings' %}
+                                          <p>Please choose {{ entry.Details }}</p>
+                                            <div class="form-group">
+                                              <label for="Topping 1" class="col-sm-4">Choose Topping</label>
+                                              <select name="Topping 1" class="form-control">
+                                                {% for topping_entry in toppings %}
+                                                  <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                {% endfor %}
+                                              </select>
+                                            </div>
+                                            <div class="form-group">
+                                              <label for="Topping 2" class="col-sm-4">Choose Topping</label>
+                                              <select name="Topping 2" class="form-control">
+                                                {% for topping_entry in toppings %}
+                                                  <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                {% endfor %}
+                                              </select>
+                                            </div>
+                                          {% else %}
+                                            {% if entry.Details == '3 Toppings' %}
+                                            <p>Please choose {{ entry.Details }}</p>
+                                              <div class="form-group">
+                                                <label for="Topping 1" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 1" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                              <div class="form-group">
+                                                <label for="Topping 2" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 2" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                              <div class="form-group">
+                                                <label for="Topping 3" class="col-sm-4">Choose Topping</label>
+                                                <select name="Topping 3" class="form-control">
+                                                  {% for topping_entry in toppings %}
+                                                    <option value="{{topping_entry.Type}}">{{topping_entry.Type}}</option>
+                                                  {% endfor %}
+                                                </select>
+                                              </div>
+                                            {% else %}
+                                            <div class="form-group">
+                                              <label for="defaultIngredient" class="col-sm-3">Ingredient</label>
+                                              <input name="defaultIngredient" type="text" class="" value="{{entry.Details}}" readonly />
+                                            </div>
+                                            {% endif %}
+                                          {% endif %}
+                                        {% endif %}
+
+
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- Modal -->
 
                             <div class="media-body align-self-center">
                                 <div class="d-flex justify-content-between mb10">
-                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.type }}, {{entry.size}}</h3>
+                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.Type }}, {{entry.Size}}</h3>
 
                                     <div class="align-self-center">
-                                        <strong class="text-white font700">{{ entry.price }}</strong>
+                                        <strong class="text-white font700">{{ entry.Price }}</strong>
                                     </div>
                                 </div>
 
-                                <p class="mb-0">Contains: {{ entry.pizzaDetails }}</p>
+                                <p class="mb-0">Contains: {{ entry.Details }}</p>
                             </div>
                           </article>
                         {% endfor %}
-                    </div>
+                      </div>
                   </div>
               </div>
-              <div role="tabpanel" class="tab-pane fade" id="lunch">
+              <!-- Subs Tab -->
+              <div role="tabpanel" class="tab-pane fade" id="Subs">
+                    <p> Add additional cheese to any sub for an additional 0.50!</p>
+                     <div class="row">
+                      <div class="col-md-6 mb20">
+                        {% for entry in sub1 %}
+                          <article class="media">
+                              <!-- Article Image -->
+                              <a class = "subEntry" href='#sub1{{ forloop.counter }}' data-toggle="modal">
+                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/sub_'|add:entry.Type|add:'.jpg' %}" alt="Menu title">
+                              </a>
+
+                              <!-- Modal -->
+                              <div class="modal fade" id="sub1{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                    <form id="role-form" action='/submitordersub'  method="POST">
+                                      {% csrf_token %}
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">{{entry.Type}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="Type" class="col-sm-2">Type</label>
+                                          <input name="Type" type="text" class="" value="{{entry.Type}}" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="Size" class="col-sm-2">Size</label>
+                                          <input name="Size" type="text" class="" value="{{entry.Size}}" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="extraCheese" class="col-sm-6">I want extra cheese! (0.50)</label>
+                                          <input type="checkbox" name="extraCheese" value="Extra Cheese">
+                                        </div>
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- Modal -->
+
+                            <div class="media-body align-self-center">
+                                <div class="d-flex justify-content-between mb10">
+                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.Type }}, {{entry.Size}}</h3>
+
+                                    <div class="align-self-center">
+                                        <strong class="text-white font700">{{ entry.Price }}</strong>
+                                    </div>
+                                </div>
+
+                                <!-- <p class="mb-0">Contains: {{ entry.Details }}</p> -->
+                            </div>
+                          </article>
+                        {% endfor %}
+                      </div>
+
+                      <div class="col-md-6 mb20">
+                        {% for entry in sub2 %}
+                          <article class="media">
+                              <!-- Article Image -->
+                              <a class = "subEntry" href='#sub2{{ forloop.counter }}' data-toggle="modal">
+                                  <img class="mr-4" width="100" height="100" src="{% static 'assets/sub_'|add:entry.Type|add:'.jpg' %}" alt="Menu title">
+                              </a>
+
+                              <!-- Modal -->
+                              <div class="modal fade" id="sub2{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                  <div class="modal-content">
+                                    <form id="role-form" action='/submitordersub'  method="POST">
+                                      {% csrf_token %}
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">{{entry.Type}}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body">
+                                        <div class="form-group">
+                                          <label for="Type" class="col-sm-2">Type</label>
+                                          <input name="Type" type="text" class="" value="{{entry.Type}}" readonly />
+                                        </div>
+                                        <div class="form-group">
+                                          <label for="Size" class="col-sm-2">Size</label>
+                                          <input name="Size" type="text" class="" value="{{entry.Size}}" readonly />
+                                        </div>
+                                        {% if entry.Type == 'Steak' %}
+                                          {% if entry.Size == 'Small' %}
+
+                                          <div class="form-group">
+                                            <label for="extraCheese" class="col-sm-6">Add Cheese! (0.45)</label>
+                                            <input type="checkbox" name="extraCheese" value="Steak Cheese">
+                                            <label for="steakMushrooms" class="col-sm-6">Add Mushrooms! (0.50)</label>
+                                            <input type="checkbox" name="steakMushrooms" value="Steak Green Peppers">
+                                            <label for="steakGreenPeppers" class="col-sm-6">Add Green Peppers! (0.50)</label>
+                                            <input type="checkbox" name="steakGreenPeppers" value="Steak Green Peppers">
+                                            <label for="steakOnions" class="col-sm-6">Add Onions! (0.50)</label>
+                                            <input type="checkbox" name="steakOnions" value="Steak Onions">
+                                          </div>
+
+                                          {% else %}
+
+                                          <div class="form-group">
+                                            <label for="extraCheese" class="col-sm-6">Add Cheese! (0.55)</label>
+                                            <input type="checkbox" name="extraCheese" value="Steak Cheese">
+                                            <label for="steakMushrooms" class="col-sm-6">Add Mushrooms! (0.50)</label>
+                                            <input type="checkbox" name="steakMushrooms" value="Steak Mushrooms">
+                                            <label for="steakGreenPeppers" class="col-sm-6">Add Green Peppers! (0.50)</label>
+                                            <input type="checkbox" name="steakGreenPeppers" value="Steak Green Peppers">
+                                            <label for="steakOnions" class="col-sm-6">Add Onions! (0.50)</label>
+                                            <input type="checkbox" name="steakOnions" value="Steak Onions">
+                                          </div>
+
+                                          {% endif %}
+                                        {% else %}
+                                          <div class="form-group">
+                                            <label for="extraCheese" class="col-sm-6">I want extra cheese! (0.50)</label>
+                                            <input type="checkbox" name="extraCheese" value="Extra Cheese">
+                                          </div>
+                                        {% endif %}
+                                      </div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                              <!-- Modal -->
+
+                            <div class="media-body align-self-center">
+                                <div class="d-flex justify-content-between mb10">
+                                    <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">{{ entry.Type }}, {{entry.Size}}</h3>
+
+                                    <div class="align-self-center">
+                                        <strong class="text-white font700">{{ entry.Price }}</strong>
+                                    </div>
+                                </div>
+
+                                {% if entry.Type == 'Steak' %}
+                                  {% if entry.Size == 'Small' %}
+
+                                    <p class="mb-0">Add Cheese (0.45), Mushrooms (0.50), Green Peppers (0.50), or Onions (0.50) </p>
+
+                                  {% else %}
+
+                                    <p class="mb-0">Add Cheese (0.55), Mushrooms (0.50), Green Peppers (0.50), or Onions (0.50) </p>
+                                  {% endif %}
+                                {% endif %}
+                            </div>
+                          </article>
+                        {% endfor %}
+                      </div>
+
+                  </div>
+              </div>
+              <div role="tabpanel" class="tab-pane fade" id="Toppings">
                      <div class="row">
                       <div class="col-md-6 mb20">
                           <article class="media">
@@ -126,7 +500,7 @@
                               </a>
                               <!--Image -->
                               <!--Content -->
-                              <div class="media-body align-self-center g-pl-10">
+                              <div class="media-body align-self-center ">
                                   <div class="d-flex justify-content-between mb10">
                                       <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">Menu title</h3>
 
@@ -142,32 +516,6 @@
 
                       </div>
                         <div class="col-md-6 mb20">
-                             <article class="media">
-                              <!-- Article Image -->
-                              <a class="g-width-100" href="#">
-                                  <img class="img-fluid mr-4" width="80" src="http://bootstraplovers.com/assan-kit-3.8/bootstrap4/website-templates/classic-template/html/images/resto/food1.jpg" alt="Menu title">
-                              </a>
-                              <!--Image -->
-                              <!--Content -->
-                              <div class="media-body align-self-center g-pl-10">
-                                  <div class="d-flex justify-content-between mb10">
-                                      <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">Menu title</h3>
-
-                                      <div class="align-self-center">
-                                          <strong class="text-white font700">$1.20</strong>
-                                      </div>
-                                  </div>
-
-                                  <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                              </div>
-                              <!--/Content -->
-                          </article><!--/Article -->
-                      </div>
-                  </div>
-              </div>
-              <div role="tabpanel" class="tab-pane fade" id="dinner">
-                     <div class="row">
-                      <div class="col-md-6 mb20">
                           <article class="media">
                               <!-- Article Image -->
                               <a class="g-width-100" href="#">
@@ -175,30 +523,7 @@
                               </a>
                               <!--Image -->
                               <!--Content -->
-                              <div class="media-body align-self-center g-pl-10">
-                                  <div class="d-flex justify-content-between mb10">
-                                      <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">Menu title</h3>
-
-                                      <div class="align-self-center">
-                                          <strong class="text-white font700">$1.20</strong>
-                                      </div>
-                                  </div>
-
-                                  <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                              </div>
-                              <!--/Content -->
-                          </article><!--/Article -->
-
-                      </div>
-                        <div class="col-md-6 mb20">
-                          <article class="media">
-                              <!-- Article Image -->
-                              <a class="g-width-100" href="#">
-                                  <img class="img-fluid mr-4" width="80" src="http://bootstraplovers.com/assan-kit-3.8/bootstrap4/website-templates/classic-template/html/images/resto/food10.jpg" alt="Menu title">
-                              </a>
-                              <!--Image -->
-                              <!--Content -->
-                              <div class="media-body align-self-center g-pl-10">
+                              <div class="media-body align-self-center ">
                                   <div class="d-flex justify-content-between mb10">
                                       <h3 class="align-self-center text-capitalize mb0 h6 text-white font400">Menu title</h3>
 

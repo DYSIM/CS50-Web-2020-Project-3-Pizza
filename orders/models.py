@@ -6,12 +6,14 @@ from django.contrib.contenttypes.models import ContentType
 # Create your models here.
 
 class pizza(models.Model):
+    Category = models.CharField(max_length=5,default='Pizza')
     Type =  models.CharField(max_length=30)
     Size = models.CharField(max_length=5) #Big or Small
     Details = models.CharField(max_length=10) #Cheese, 1,2,or 3 toppings, special
     Price = models.DecimalField(max_digits=4, decimal_places=2)
 
 class sub(models.Model):
+    Category = models.CharField(max_length=3,default='Sub')
     Type = models.CharField(max_length=30)
     Size = models.CharField(max_length=5)
     Price = models.DecimalField(max_digits=4, decimal_places=2)
@@ -22,14 +24,17 @@ class sub_addition(models.Model): #for steak + {cheese, mushroom, green pepper, 
     AdditionalPrice = models.DecimalField(max_digits=4, decimal_places=2)
 
 class pasta(models.Model):
+    Category = models.CharField(max_length=5,default='Pasta')
     Type = models.CharField(max_length=30)
     Price = models.DecimalField(max_digits=4, decimal_places=2)
 
 class salads(models.Model):
+    Category = models.CharField(max_length=6,default='Salads')
     Type = models.CharField(max_length=30)
     Price = models.DecimalField(max_digits=4, decimal_places=2)
 
 class dinnerPlatters(models.Model):
+    Category = models.CharField(max_length=15,default='Dinner Platters')
     Type = models.CharField(max_length=30)
     Size = models.CharField(max_length=5)
     Price = models.DecimalField(max_digits=4, decimal_places=2)
@@ -49,3 +54,5 @@ class order(models.Model):
     Sub_2 = models.ForeignKey(sub_addition, blank=True, null=True, on_delete=models.CASCADE, related_name = "Sub_2")
     Sub_3 = models.ForeignKey(sub_addition, blank=True, null=True, on_delete=models.CASCADE, related_name = "Sub_3")
     Sub_4 = models.ForeignKey(sub_addition, blank=True, null=True, on_delete=models.CASCADE, related_name = "Sub_4")
+    Price = models.DecimalField(max_digits=4, decimal_places=2)
+    completed = models.BooleanField(default = False)

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'index.js' %}"></script>
+
+</script>
+{% endblock %}
+
+{% block title %}
+<title>Cart</title>
+{% endblock %}
+
+{% block body %}
+<body class = 'text-center content_body'>
+  <!-- Top navigation bar -->
+  <nav class="navbar navbar-expand-sm navbar-light nav-fill">
+    <a class="navbar-brand" href="#">
+    <img src="{% static 'assets/brand.gif' %}" alt=""></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-center"  id="collapsibleNavbar">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Track your orders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'cart' %}">Cart</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'index' %}">Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="border-0 bg-light">
+            <div class="p-2 px-3 text-uppercase">Items in your cart</div>
+          </th>
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Price</div>
+          </th>
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Remove</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <th scope="row" class="border-bottom">
+            <div class="p-2">
+              {% if order.content_object.Category == 'Pizza' %}
+                <img src="{% static 'assets/'|add:order.content_object.Type|add:'_'|add:order.content_object.Details|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+              {% else %}
+                {% if order.content_object.Category == 'Sub' %}
+                  <img src="{% static 'assets/sub_'|add:order.content_object.Type|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                {% endif %}
+              {% endif %}
+              <div class="ml-3 d-inline-block align-middle">
+                <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.content_object.Type}}</a></h5>
+                <span class="text-muted font-weight-normal font-italic d-block">
+                  {% if order.content_object.Size %}
+                    {{order.content_object.Size}} sized
+                  {% endif %}
+                  {{order.content_object.Category}}
+                  {% if order.content_object.Details %}
+                    with {{order.content_object.Details}}
+                  {% endif %}
+                  {% if order.Topping_1 %}
+                    of {{order.Topping_1.Type}}
+                  {% endif %}
+                  {% if order.Topping_2 %}
+                    + {{order.Topping_2.Type}}
+                  {% endif %}
+                  {% if order.Topping_3 %}
+                    + {{order.Topping_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_1 %}
+                    + {{order.Sub_1.Type}}
+                  {% endif %}
+                  {% if order.Sub_2 %}
+                    + {{order.Sub_2.Type}}
+                  {% endif %}
+                  {% if order.Sub_3 %}
+                    + {{order.Sub_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_4 %}
+                    + {{order.Sub_4.Type}}
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </th >
+          <td class="border-bottom align-middle"><strong>{{order.Price}}</strong></td><td class="align-middle"><a href="#" class="text-dark cart-trash" data-id = {{order.id}}>Delete</a></td>
+        </tr>
+        {% endfor %}
+
+        <tr>
+          <th scope="row" >
+              <div class="ml-3 d-inline-block align-middle" id= "total-sum" >
+                <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block" >Total</a></h5>
+              </div>
+
+            <td class="align-middle"><strong id='priceTotal'>{{total_price|floatformat:2}}</strong></td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+{% endblock %}

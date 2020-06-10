@@ -1,29 +1,59 @@
 
+//getCookie function
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  var picture = document.getElementsByClassName('pizzaEntry')
 
-  for (var i=0; i<picture.length; i++){
-    var x = picture[i]
-    x.onclick = function(click) {
-      if (document.contains(document.getElementById("orderPlaceHolder"))) {
-        document.getElementById("orderPlaceHolder").remove()
+// remove row and delete from database on clicking trashbin on cart page
+  var trash = document.getElementsByClassName("cart-trash")
+  for(var i = 0; i < trash.length; i++){
+    trash[i].onclick = function() {
+      var box = this
+      var price = box.parentNode.previousSibling.firstChild.innerHTML;
+
+      var order_id = box.dataset.id
+      var xhttp = new XMLHttpRequest();
+      xhttp.open("POST", '/delete')
+      xhttp.onload = () => {
+        this.parentNode.parentNode.style.background = 'yellow';
+        setTimeout(function(){
+            box.parentNode.parentNode.style.display = 'none';
+        },500);
+
+        totalPriceElement = document.getElementById('priceTotal');
+        currTotalPrice = totalPriceElement.innerHTML;
+        totalPriceElement.innerHTML = (parseFloat(currTotalPrice) - parseFloat(price)).toFixed(2);
+
+
       }
-      var orders = document.getElementById('userOrders')
-      var dataset = x.dataset;
-      var pElement = document.createElement('p');
-      for (d in dataset) {
-        let content =
-          `${d}: ${dataset[d]}\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0`;
-        pElement.innerHTML += content;
+     var csrftoken = getCookie('csrftoken');
+     xhttp.setRequestHeader("X-CSRFToken", csrftoken);
+     const data_ = new FormData();
+     data_.append('order_id', order_id);
+     xhttp.send(data_);
+     return false;
 
-        
-      }
 
-      orders.appendChild(pElement)
-      click.preventDefault();
     }
   }
+// remove row and delete from database on clicking trashbin on cart page
+
+
 
 
 

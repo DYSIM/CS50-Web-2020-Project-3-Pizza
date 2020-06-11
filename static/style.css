@@ -18,9 +18,28 @@ body {
   margin-left:9rem;
 }
 
+.login_page_body h1{
+  margin-top: 4rem;
+  font-weight: lighter;
+  font-family: Arial, Helvetica, sans-serif;
+  text-shadow: 0 0 3px grey;
+}
 
+.jumbotron h1{
+  color: #9B1B30;
+}
+
+.jumbotron h3{
+  color: #264E36;
+}
 .login_page_body{
+
   align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  background-image: linear-gradient(rgba(255, 0, 0,0.9), rgba(0, 200, 0,6));
+
+
 }
 .jumbotron {
   text-align: center;

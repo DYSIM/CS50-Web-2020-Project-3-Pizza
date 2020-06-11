@@ -3,13 +3,18 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.db.models import Sum
 from django.contrib.auth import authenticate, login, logout
-from orders.models  import pizza,toppings,order,sub,sub_addition
+from orders.models  import pizza,toppings,order,sub,sub_addition,pasta,salads,dinnerPlatters
+from django.contrib.auth.models import User
 from django.db import models
 import math
 # Create your views here.
 def index(request):
+
     if not request.user.is_authenticated:
-        return render(request,"login.html",{"message":None})
+        return render(request,"login.html")
+
+
+
 
     pizza_entries = list(pizza.objects.all()) #force list to split half
     half = int(math.ceil(len(pizza_entries)/2))
@@ -21,8 +26,26 @@ def index(request):
     sub1 = sub_entries[:half]
     sub2 = sub_entries[half:]
 
+    pasta_entries = list(pasta.objects.all()) #force list to split half
+    half = int(math.ceil(len(pasta_entries)/2))
+    pasta1 = pasta_entries[:half]
+    pasta2 = pasta_entries[half:]
+
+    salads_entries = list(salads.objects.all()) #force list to split half
+    half = int(math.ceil(len(salads_entries)/2))
+    salads1 = salads_entries[:half]
+    salads2 = salads_entries[half:]
+
+    dinnerPlatters_entries = list(dinnerPlatters.objects.all()) #force list to split half
+    half = int(math.ceil(len(dinnerPlatters_entries)/2))
+    dinnerPlatters1 = dinnerPlatters_entries[:half]
+    dinnerPlatters2 = dinnerPlatters_entries[half:]
+
 
     toppings_entries = toppings.objects.all()
+    half = int(math.ceil(len(toppings_entries)/2))
+    toppings1 = toppings_entries[:half]
+    toppings2 = toppings_entries[half:]
 
     context = {
         "user" : request.user,
@@ -30,14 +53,22 @@ def index(request):
         "pizza2":  pizza2,
         "sub1":  sub1,
         "sub2":  sub2,
-        "toppings": toppings_entries
+        "salads1":salads1,
+        "salads2":salads2,
+        "pasta1":pasta1,
+        "pasta2":pasta2,
+        "dinnerPlatters1":dinnerPlatters1,
+        "dinnerPlatters2":dinnerPlatters2,
+        "toppings": toppings_entries,
+        "toppings1": toppings1,
+        "toppings2": toppings2
     }
     return render(request, 'user.html',context)
 
 #cart views
 def cart_view(request):
-    order_entry = order.objects.filter(Name = request.user)
-    total = order.objects.filter(Name = request.user).aggregate(Sum('Price',
+    order_entry = order.objects.filter(Name = request.user, Submitted= False)
+    total = order.objects.filter(Name = request.user, Submitted= False).aggregate(Sum('Price',
                                     output_field = models.DecimalField(max_digits=4, decimal_places=2)))
     context = {
         "user" : request.user,
@@ -47,8 +78,49 @@ def cart_view(request):
 
     return render(request, 'cart.html',context)
 
+#track order
+def trackorder_view(request):
+    if request.user.username == 'admin':
+        pendingorders = order.objects.filter(Completed = False, Submitted = True)
+        pendingorders_total = order.objects.filter(Completed = False, Submitted = True).aggregate(Sum('Price',
+                                        output_field = models.DecimalField(max_digits=4, decimal_places=2)))
+        completedorders = order.objects.filter(Completed = True, Submitted = True)
+        completedorders_total = order.objects.filter(Completed = True, Submitted = True).aggregate(Sum('Price',
+                                        output_field = models.DecimalField(max_digits=4, decimal_places=2)))
+    else:
+        pendingorders = order.objects.filter(Name = request.user, Completed = False, Submitted = True)
+        pendingorders_total =order.objects.filter(Name = request.user, Completed = False, Submitted = True).aggregate(Sum('Price',
+                                        output_field = models.DecimalField(max_digits=4, decimal_places=2)))
+        completedorders = order.objects.filter(Name = request.user, Completed = True, Submitted = True)
+        completedorders_total = order.objects.filter(Name = request.user, Completed = True, Submitted = True).aggregate(Sum('Price',
+                                        output_field = models.DecimalField(max_digits=4, decimal_places=2)))
+
+
+    context = {
+        "user" : request.user,
+        "pendingorders": pendingorders,
+        "pendingorders_total":pendingorders_total['Price__sum'],
+        "completedorders": completedorders,
+        "completedorders_total":completedorders_total['Price__sum']
+    }
+
+    return render(request, 'trackorders.html',context)
+
 #login
 def login_view(request):
+    if request.POST.get('Register'):
+        username = request.POST['username']
+        password = request.POST['password']
+        try:
+            user = User.objects.get(username=username)
+            context = {'message':'The username you entered has already been taken. Please try another username.'}
+            return render(request, 'login.html', {"message":"This username has been taken! Please choose another username."})
+        except User.DoesNotExist:
+            user= User.objects.create_user(username, password= password)
+            return render(request, 'login.html', {"message":"Account created! Please login."})
+
+
+
     username = request.POST['username']
     password = request.POST['password']
     user = authenticate(request, username=username, password=password)
@@ -69,6 +141,20 @@ def delete_from_cart(request):
     id_to_be_deleted = dict(request.POST)['order_id'][0]
     entry = order.objects.get(id = id_to_be_deleted)
     entry.delete()
+    return HttpResponse(status=200)
+
+#complete order
+def complete_order(request):
+    id_to_be_confirmed = dict(request.POST)['order_id'][0]
+    entry = order.objects.get(id = id_to_be_confirmed)
+    entry.Completed = True
+    entry.save()
+    return HttpResponse(status=200)
+
+#submit cart
+def submitcart(request):
+    cart_entries = order.objects.filter(Name = request.user, Submitted= False).update(Submitted=True)
+
     return HttpResponse(status=200)
 
 #submit_order
@@ -106,6 +192,48 @@ def submitorderpizza(request):
     # for i in order_entry:
     #     print(i.Name, i.content_object.Type, i.content_object.Size, i.content_object.Details ,i.Topping_1, i.content_object.Price)
     # print(order_entry)
+    return HttpResponseRedirect(reverse("index"))
+
+#submit pasta  order
+def submitordersalads(request):
+    data = dict(request.POST)
+    type = data['Type'][0]
+    salad_entry = salads.objects.get(Type = type)
+    price = salad_entry.Price
+    new_order = order(Name = request.user, content_object = salad_entry,
+                        Topping_1 = None, Topping_2 = None, Topping_3 = None,
+                        Sub_1=None,Sub_2 = None,Sub_3= None,Sub_4=None, Price = price)
+
+    new_order.save()
+    return HttpResponseRedirect(reverse("index"))
+
+#submit pasta  order
+def submitorderpasta(request):
+    data = dict(request.POST)
+    type = data['Type'][0]
+    pasta_entry = pasta.objects.get(Type = type)
+    price = pasta_entry.Price
+    new_order = order(Name = request.user, content_object = pasta_entry,
+                        Topping_1 = None, Topping_2 = None, Topping_3 = None,
+                        Sub_1=None,Sub_2 = None,Sub_3= None,Sub_4=None, Price = price)
+
+    new_order.save()
+    return HttpResponseRedirect(reverse("index"))
+
+
+
+#submit dinner platter  order
+def submitorderdinnerplatter(request):
+    data = dict(request.POST)
+    type = data['Type'][0]
+    size = data['Size'][0]
+    dp_entry = dinnerPlatters.objects.get(Type = type, Size =size)
+    price = dp_entry.Price
+    new_order = order(Name = request.user, content_object = dp_entry,
+                        Topping_1 = None, Topping_2 = None, Topping_3 = None,
+                        Sub_1=None,Sub_2 = None,Sub_3= None,Sub_4=None, Price = price)
+
+    new_order.save()
     return HttpResponseRedirect(reverse("index"))
 
 #submit sub order

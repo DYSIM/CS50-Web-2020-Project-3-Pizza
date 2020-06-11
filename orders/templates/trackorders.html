@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block script %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'trackorders.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+<title>Track Your Orders</title>
+{% endblock %}
+
+{% block body %}
+
+<body class = 'text-center content_body'>
+
+
+  <nav class="navbar navbar-expand-sm navbar-light nav-fill">
+    <a class="navbar-brand" href="#">
+    <img src="{% static 'assets/brand.gif' %}" alt=""></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-center"  id="collapsibleNavbar">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Track your orders</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'cart' %}">Cart</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'index' %}">Menu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <div class="table-responsive">
+
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="border-0 bg-light">
+            <div class="p-2 px-3 text-uppercase">Pending Items</div>
+          </th>
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Price</div>
+          </th>
+          {% if user.username == 'admin' %}
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Remove</div>
+          </th>
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Complete</div>
+          </th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in pendingorders %}
+        <tr>
+          <th scope="row" class="border-bottom">
+            <div class="p-2">
+              {% if order.content_object.Category == 'Pizza' %}
+                <img src="{% static 'assets/'|add:order.content_object.Type|add:'_'|add:order.content_object.Details|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+              {% else %}
+                {% if order.content_object.Category == 'Sub' %}
+                  <img src="{% static 'assets/sub_'|add:order.content_object.Type|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                {% else %}
+                  {% if order.content_object.Category == 'Salads' %}
+                    {% if order.content_object.Type == 'Salad w/Tuna' %}
+                      <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/salad_Tuna.jpg' %}" alt="Menu title">
+                    {% else %}
+                      <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/salad_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                    {% endif %}
+
+                  {% else %}
+                    {% if order.content_object.Category == 'Pasta' %}
+                      {% if order.content_object.Type == 'Baked Ziti w/Mozzarella' %}
+
+                        <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/pasta_Mozzarella.jpg' %}" alt="Menu title">
+                      {% else %}
+                        {% if order.content_object.Type == 'Baked Ziti w/Meatballs' %}
+                          <img width="70" class="img-fluid rounded shadow-sm"src="{% static 'assets/pasta_Meatballs.jpg' %}" alt="Menu title">
+                        {% else %}
+                          {% if order.content_object.Type == 'Baked Ziti w/Chicken' %}
+                            <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/pasta_Chicken.jpg' %}" alt="Menu title">
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+                    {% else %}
+                      {% if order.content_object.Category == 'Dinner Platters' %}
+                        <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/DinnerPlatter_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+              <div class="ml-3 d-inline-block align-middle">
+                {% if user.username == 'admin' %}
+                  <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.content_object.Type}} ------ {{order.Name.username}}</a></h5>
+                {% else %}
+                  <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.content_object.Type}}</a></h5>
+                {% endif %}
+                <span class="text-muted font-weight-normal font-italic d-block">
+                  {% if order.content_object.Size %}
+                    {{order.content_object.Size}} sized
+                  {% endif %}
+                  {{order.content_object.Category}}
+                  {% if order.content_object.Details %}
+                    with {{order.content_object.Details}}
+                  {% endif %}
+                  {% if order.Topping_1 %}
+                    of {{order.Topping_1.Type}}
+                  {% endif %}
+                  {% if order.Topping_2 %}
+                    + {{order.Topping_2.Type}}
+                  {% endif %}
+                  {% if order.Topping_3 %}
+                    + {{order.Topping_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_1 %}
+                    + {{order.Sub_1.Type}}
+                  {% endif %}
+                  {% if order.Sub_2 %}
+                    + {{order.Sub_2.Type}}
+                  {% endif %}
+                  {% if order.Sub_3 %}
+                    + {{order.Sub_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_4 %}
+                    + {{order.Sub_4.Type}}
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </th >
+          <td class="border-bottom align-middle"><strong>{{order.Price}}</strong></td>
+          {% if user.username == 'admin' %}
+            <td class="border-bottom  align-middle"><a href="#" class="text-dark trackorder-trash-button" data-id = {{order.id}}>Delete</a></td>
+            <td class="border-bottom  align-middle"><a href="#" class="text-dark completed-button" data-id = {{order.id}}>Completed</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+
+        <tr>
+          <th scope="row" >
+              <div class="ml-3 d-inline-block align-middle" id= "total-sum" >
+                <h5 class="mb-0 text-dark d-inline-block"> Total</h5>
+              </div>
+            <td class="align-middle"><strong id='pendingPriceTotal'>{{pendingorders_total|floatformat:2}}</strong></td>
+
+
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col" class="border-0 bg-light">
+            <div class="p-2 px-3 text-uppercase">Completed Items</div>
+          </th>
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Price</div>
+          </th>
+          {% if user.username == 'admin' %}
+          <th scope="col" class="border-0 bg-light">
+            <div class="py-2 text-uppercase">Remove</div>
+          </th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody id = 'completedOrdersBody'>
+        {% for order in completedorders %}
+        <tr>
+          <th scope="row" class="border-bottom">
+            <div class="p-2">
+              {% if order.content_object.Category == 'Pizza' %}
+                <img src="{% static 'assets/'|add:order.content_object.Type|add:'_'|add:order.content_object.Details|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+              {% else %}
+                {% if order.content_object.Category == 'Sub' %}
+                  <img src="{% static 'assets/sub_'|add:order.content_object.Type|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                {% else %}
+                  {% if order.content_object.Category == 'Salads' %}
+                    {% if order.content_object.Type == 'Salad w/Tuna' %}
+                      <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/salad_Tuna.jpg' %}" alt="Menu title">
+                    {% else %}
+                      <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/salad_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                    {% endif %}
+
+                  {% else %}
+                    {% if order.content_object.Category == 'Pasta' %}
+                      {% if order.content_object.Type == 'Baked Ziti w/Mozzarella' %}
+
+                        <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/pasta_Mozzarella.jpg' %}" alt="Menu title">
+                      {% else %}
+                        {% if order.content_object.Type == 'Baked Ziti w/Meatballs' %}
+                          <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/pasta_Meatballs.jpg' %}" alt="Menu title">
+                        {% else %}
+                          {% if order.content_object.Type == 'Baked Ziti w/Chicken' %}
+                            <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/pasta_Chicken.jpg' %}" alt="Menu title">
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+                    {% else %}
+                      {% if order.content_object.Category == 'Dinner Platters' %}
+                        <img width="70" class="img-fluid rounded shadow-sm" src="{% static 'assets/DinnerPlatter_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+              <div class="ml-3 d-inline-block align-middle">
+                {% if user.username == 'admin' %}
+                  <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.content_object.Type}} ------ {{order.Name.username}}</a></h5>
+                {% else %}
+                  <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block align-middle">{{order.content_object.Type}}</a></h5>
+                {% endif %}
+                <span class="text-muted font-weight-normal font-italic d-block">
+                  {% if order.content_object.Size %}
+                    {{order.content_object.Size}} sized
+                  {% endif %}
+                  {{order.content_object.Category}}
+                  {% if order.content_object.Details %}
+                    with {{order.content_object.Details}}
+                  {% endif %}
+                  {% if order.Topping_1 %}
+                    of {{order.Topping_1.Type}}
+                  {% endif %}
+                  {% if order.Topping_2 %}
+                    + {{order.Topping_2.Type}}
+                  {% endif %}
+                  {% if order.Topping_3 %}
+                    + {{order.Topping_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_1 %}
+                    + {{order.Sub_1.Type}}
+                  {% endif %}
+                  {% if order.Sub_2 %}
+                    + {{order.Sub_2.Type}}
+                  {% endif %}
+                  {% if order.Sub_3 %}
+                    + {{order.Sub_3.Type}}
+                  {% endif %}
+                  {% if order.Sub_4 %}
+                    + {{order.Sub_4.Type}}
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </th >
+          <td class="border-bottom align-middle"><strong>{{order.Price}}</strong></td>
+          {% if user.username == 'admin' %}
+            <td class="border-bottom  align-middle"><a href="#" class="text-dark trackorder-trash-button" data-id = {{order.id}}>Delete</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+
+        <tr>
+          <th scope="row" >
+              <div class="ml-3 d-inline-block align-middle" id= "total-sum" >
+                <h5 class="mb-0 text-dark d-inline-block"> Total</h5>
+              </div>
+            <td class="align-middle"><strong id='completedPriceTotal'>{{completedorders_total|floatformat:2}}</strong></td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+{% endblock %}

@@ -6,7 +6,6 @@
 <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
 <script src="{% static 'index.js' %}"></script>
 
-</script>
 {% endblock %}
 
 {% block title %}
@@ -25,7 +24,7 @@
     <div class="collapse navbar-collapse justify-content-center"  id="collapsibleNavbar">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a class="nav-link" href="#">Track your orders</a>
+          <a class="nav-link" href="{% url 'trackorders' %}">Track your orders</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'cart' %}">Cart</a>
@@ -39,6 +38,28 @@
       </ul>
     </div>
   </nav>
+  <button type="button" class="btn btn-success" id = 'submitCart' data-toggle="modal" data-target="#cart_submission">Submit orders to the kitchen</button>
+  <!-- Modal -->
+  <div class="modal fade" id="cart_submission" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Order Submission</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <strong id = 'cartModalBody'></strong>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-secondary"><a href="/" class='text-white text-decoration-none' id='cartModalRedirect'>Track your orders</a></button>
+          </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal -->
 
   <div class="table-responsive">
     <table class="table">
@@ -57,7 +78,7 @@
       </thead>
       <tbody>
         {% for order in orders %}
-        <tr>
+        <tr class = 'cartEntries'>
           <th scope="row" class="border-bottom">
             <div class="p-2">
               {% if order.content_object.Category == 'Pizza' %}
@@ -65,6 +86,34 @@
               {% else %}
                 {% if order.content_object.Category == 'Sub' %}
                   <img src="{% static 'assets/sub_'|add:order.content_object.Type|add:'.jpg' %}" alt="" width="70" class="img-fluid rounded shadow-sm">
+                {% else %}
+                  {% if order.content_object.Category == 'Salads' %}
+                    {% if order.content_object.Type == 'Salad w/Tuna' %}
+                      <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/salad_Tuna.jpg' %}" alt="Menu title">
+                    {% else %}
+                      <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/salad_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                    {% endif %}
+
+                  {% else %}
+                    {% if order.content_object.Category == 'Pasta' %}
+                      {% if order.content_object.Type == 'Baked Ziti w/Mozzarella' %}
+
+                        <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/pasta_Mozzarella.jpg' %}" alt="Menu title">
+                      {% else %}
+                        {% if order.content_object.Type == 'Baked Ziti w/Meatballs' %}
+                          <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/pasta_Meatballs.jpg' %}" alt="Menu title">
+                        {% else %}
+                          {% if order.content_object.Type == 'Baked Ziti w/Chicken' %}
+                            <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/pasta_Chicken.jpg' %}" alt="Menu title">
+                          {% endif %}
+                        {% endif %}
+                      {% endif %}
+                    {% else %}
+                      {% if order.content_object.Category == 'Dinner Platters' %}
+                        <img class="img-fluid rounded shadow-sm" width="70" src="{% static 'assets/DinnerPlatter_'|add:order.content_object.Type|add:'.jpg' %}" alt="Menu title">
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
                 {% endif %}
               {% endif %}
               <div class="ml-3 d-inline-block align-middle">
@@ -102,16 +151,16 @@
               </div>
             </div>
           </th >
-          <td class="border-bottom align-middle"><strong>{{order.Price}}</strong></td><td class="align-middle"><a href="#" class="text-dark cart-trash" data-id = {{order.id}}>Delete</a></td>
+          <td class="border-bottom align-middle"><strong>{{order.Price}}</strong></td>
+          <td class="border-bottom  align-middle"><a href="#" class="text-dark cart-trash" data-id = {{order.id}}>Delete</a></td>
         </tr>
         {% endfor %}
 
         <tr>
           <th scope="row" >
               <div class="ml-3 d-inline-block align-middle" id= "total-sum" >
-                <h5 class="mb-0"> <a href="#" class="text-dark d-inline-block" >Total</a></h5>
+                <h5 class="mb-0 text-dark d-inline-block"> Total</h5>
               </div>
-
             <td class="align-middle"><strong id='priceTotal'>{{total_price|floatformat:2}}</strong></td>
 
         </tr>

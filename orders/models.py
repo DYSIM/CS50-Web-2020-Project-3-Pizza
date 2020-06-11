@@ -55,4 +55,5 @@ class order(models.Model):
     Sub_3 = models.ForeignKey(sub_addition, blank=True, null=True, on_delete=models.CASCADE, related_name = "Sub_3")
     Sub_4 = models.ForeignKey(sub_addition, blank=True, null=True, on_delete=models.CASCADE, related_name = "Sub_4")
     Price = models.DecimalField(max_digits=4, decimal_places=2)
-    completed = models.BooleanField(default = False)
+    Submitted = models.BooleanField(default = False)
+    Completed = models.BooleanField(default = False)

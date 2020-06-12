@@ -15,5 +15,6 @@ urlpatterns = [
     path('completeorder',views.complete_order, name='completeorder'),
     path('submitordersalads',views.submitordersalads,name='submitordersalads'),
     path('submitorderpasta',views.submitorderpasta,name='submitorderpasta'),
-    path('submitorderdinnerplatter',views.submitorderdinnerplatter,name='submitorderdinnerplatter')
+    path('submitorderdinnerplatter',views.submitorderdinnerplatter,name='submitorderdinnerplatter'),
+    path('register', views.register_view,name='register')
 ]

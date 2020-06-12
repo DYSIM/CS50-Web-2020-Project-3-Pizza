@@ -47,6 +47,8 @@ def index(request):
     toppings1 = toppings_entries[:half]
     toppings2 = toppings_entries[half:]
 
+    order_entry = order.objects.filter(Name = request.user, Submitted= False)
+
     context = {
         "user" : request.user,
         "pizza1":  pizza1,
@@ -61,7 +63,8 @@ def index(request):
         "dinnerPlatters2":dinnerPlatters2,
         "toppings": toppings_entries,
         "toppings1": toppings1,
-        "toppings2": toppings2
+        "toppings2": toppings2,
+        "order_entry": order_entry
     }
     return render(request, 'user.html',context)
 
@@ -108,16 +111,7 @@ def trackorder_view(request):
 
 #login
 def login_view(request):
-    if request.POST.get('Register'):
-        username = request.POST['username']
-        password = request.POST['password']
-        try:
-            user = User.objects.get(username=username)
-            context = {'message':'The username you entered has already been taken. Please try another username.'}
-            return render(request, 'login.html', {"message":"This username has been taken! Please choose another username."})
-        except User.DoesNotExist:
-            user= User.objects.create_user(username, password= password)
-            return render(request, 'login.html', {"message":"Account created! Please login."})
+
 
 
 
@@ -130,6 +124,20 @@ def login_view(request):
     else:
         return render(request, "login.html",{"message":"Invalid Credentials"})
 
+def register_view(request):
+    if request.method == 'GET':
+        return render(request, "register.html")
+    elif request.method == 'POST':
+        if request.POST.get('Register'):
+            username = request.POST['username']
+            password = request.POST['password']
+            try:
+                user = User.objects.get(username=username)
+                context = {'message':'The username you entered has already been taken. Please try another username.'}
+                return render(request, 'login.html', {"message":"This username has been taken! Please choose another username."})
+            except User.DoesNotExist:
+                user= User.objects.create_user(username, password= password)
+                return render(request, 'login.html', {"message":"Account created! Please login."})
 
 #logout
 def logout_view(request):

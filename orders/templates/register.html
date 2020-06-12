@@ -18,10 +18,10 @@
 
   <h1>Pinocchio's Pizza and Subs</h1>
 
-  <form class="form-signin" action="{% url 'login' %}" method='POST'>
+  <form class="form-signin" action="{% url 'register' %}" method='POST'>
     {% csrf_token %}
     <img class="mb-4" src="{% static 'assets/brand.gif' %}" alt="" >
-    <h1 class="h3 mb-3 font-weight-normal">Please sign in below.</h1>
+    <h1 class="h3 mb-3 font-weight-normal">Please register below</h1>
     {% if message %}
       <p>{{message}}</p>
     {% endif %}
@@ -29,8 +29,13 @@
     <input type="text" name='username' id="inputUsername" class="form-control" placeholder="Username" required autofocus>
     <label for="inputPassword" class="sr-only">Password</label>
     <input type="password" name='password' id="inputPassword" class="form-control" placeholder="Password" required>
-    <button class="btn btn-lg btn-primary btn-block" type="submit" name = 'Sign in' value = 'Sign in'>Sign in</button>
-    <a href="register">Register</a>
+    <label for="inputFirstname" class="sr-only">First Name</label>
+    <input type="text" name='firstname' id="inputFirstname" class="form-control" placeholder="First Name" required>
+    <label for="inputLastname" class="sr-only">Last Name</label>
+    <input type="text" name='lastname' id="inputLastname" class="form-control" placeholder="Last name" required>
+    <label for="inputemail" class="sr-only">Email</label>
+    <input type="email" name='email' id="inputemail" class="form-control" placeholder="Email" required>
+    <button class="btn btn-lg btn-primary btn-block" type="submit" name = 'Register' value = 'Register'>Register</button>
     <p class="mt-3 mb-3 text-muted">&copy; Pinocchio's Pizza & Subs</p>
   </form>
 

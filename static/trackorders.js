@@ -81,9 +81,14 @@ for (var i = 0; i < completed_buttons.length; i++){
 
       var pendingPriceElement = document.getElementById('pendingPriceTotal');
       pendingTotalPrice = pendingPriceElement.innerHTML;
+
       pendingPriceElement.innerHTML = (parseFloat(pendingTotalPrice) - parseFloat(price)).toFixed(2);
       var completedPriceElement = document.getElementById('completedPriceTotal');
       completedTotalPrice = completedPriceElement.innerHTML;
+      
+      if (completedTotalPrice == ''){
+        completedTotalPrice = 0.00
+      }
       completedPriceElement.innerHTML = (parseFloat(completedTotalPrice) + parseFloat(price)).toFixed(2);
     }
     var csrftoken = getCookie('csrftoken');

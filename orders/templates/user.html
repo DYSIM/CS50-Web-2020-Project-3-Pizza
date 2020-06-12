@@ -14,34 +14,48 @@
 
 <body class = 'text-center content_body'>
 
-    <nav class="navbar navbar-expand-sm navbar-light nav-fill">
-      <a class="navbar-brand" href="#">
-      <img src="{% static 'assets/brand.gif' %}" alt=""></a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-center"  id="collapsibleNavbar">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'trackorders' %}">Track your orders</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'cart' %}">Cart</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Menu</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+
+    <div class="navbar-div">
+      <nav class="navbar navbar-expand-sm navbar-light nav-fill justify-content-center">
+        <a class="navbar-brand" href="#">
+        <img src="{% static 'assets/brand.gif' %}" alt=""></a>
+
+        <h1>Pinnocchio's Pizza and Subs</h1>
+
+
+      </nav>
+
+      <nav class="navbar navbar-expand-sm navbar-light nav-fill">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center"  id="collapsibleNavbar">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'trackorders' %}">Track your orders</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'cart' %}">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Menu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+
 
     <div class="container-fluid">
       <div class="jumbotron jumbotron-fluid">
         <h1><strong>Hello, {{user.username}}</strong></h1>
         <h3>Welcome to Pinocchio's!</h3>
+        {% if order_entry %}
+          <p>Checkout your orders through your cart.</p>
+        {% endif %}
       </div>
     </div>
 

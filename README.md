@@ -6,17 +6,17 @@ Pizza Project
 
 https://youtu.be/Rb251V9aYXM
 
-#Description
+# Description
 
 Create a web app to manage orders for http://www.pinocchiospizza.net/ with Django and Sqlite3
 
-#Instructions
+# Instructions
 
 pip install requirements.txt
 
 python manage.py runserver
 
-#Features
+# Features
 
 Users can register and login
 
